@@ -49,16 +49,6 @@ pip install requests psycopg[binary] rich
 
 ---
 
-## ▶️ Rulare rapidă
-
-```bash
-python nl2sql_assistant_ascii_v2_explicat.py
-```
-
-La pornire, aplicația cere interactiv datele de conectare (host, port, user, **parolă mascată**, bază). După conectare, încarcă schema și intri în bucla de conversație.
-
----
-
 ## 💬 Utilizare – exemple
 
 ````text
@@ -196,15 +186,3 @@ INSERT INTO orders (customer_id, order_date, total_amount) VALUES
 (2,'2024-08-20',2800.00);
 ```
 
----
-
-## ❓ Întrebări frecvente
-
-**Q:** Primesc eroare `JSONDecodeError: Extra data` la răspunsul LLM.
-**A:** Asigură‑te că requestul la Ollama folosește `stream: false`. Răspunsurile „pe bucăți” (NDJSON) nu pot fi parse‑ate cu `r.json()`.
-
-**Q:** Pot folosi alt model?
-**A:** Da. Schimbă `MODEL` la ce ai în Ollama (ex. `llama3.1:8b-instruct`).
-
-**Q:** Se execută INSERT/UPDATE?
-**A:** Nu. Scriptul doar propune SQL; execuția se face **numai** dacă tu confirmi, iar conexiunea este **read‑only**.
