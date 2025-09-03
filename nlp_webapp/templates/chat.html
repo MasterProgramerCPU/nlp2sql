@@ -8,8 +8,8 @@
     </div>
   </div>
 
-  <!-- Loader-ul va fi afișat DOAR când formularul are clasa .htmx-request -->
-  <form hx-post="/ask" hx-target="#chat" hx-swap="beforeend" class="grow chat-form">
+  <!-- fără leading slash; htmx va trimite relativ la prefix -->
+  <form hx-post="ask" hx-target="#chat" hx-swap="beforeend" class="grow chat-form">
     <label class="muted">Prompt (în română)</label>
     <textarea name="prompt" class="input" placeholder="Ex: Top 10 produse pe venit din ultimele 90 zile, cu categorie."></textarea>
     <div class="row mt">
@@ -46,7 +46,6 @@
     </div>
   </div>
 
-  <!-- overlay-ul de loading pentru diagramă rămâne cum era, doar când se încarcă schema -->
   <div id="cy" class="graph"></div>
   <div class="muted small">Zoom: rotița • Pan: drag • Focus: dublu-click.</div>
 </div>

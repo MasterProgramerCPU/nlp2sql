@@ -8,6 +8,8 @@ from fastapi import FastAPI, Form, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Form, Request, HTTPException
+from fastapi.responses import RedirectResponse
 
 # ── Config ────────────────────────────────────────────────────────────────────
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
@@ -147,7 +149,9 @@ async def connect(request: Request,
     STATE["tables"] = tables
     STATE["fks"] = fks
     STATE["system_prompt"] = build_system_prompt(schema_text_for_llm(tables, fks))
-    return RedirectResponse("/chat", status_code=302)
+
+    # IMPORTANT: redirect relativ la app montata (pastreaza /apps/nl2sql)
+    return RedirectResponse(url=request.url_for("chat"), status_code=303)
 
 @app.get("/chat", response_class=HTMLResponse)
 async def chat(request: Request):

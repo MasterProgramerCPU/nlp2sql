@@ -143,3 +143,15 @@ th{ background: #161a3e; color: #ffd3ea; position: sticky; top: 0; z-index: 1; }
   box-shadow: 0 0 14px rgba(255,29,142,.45);
 }
 @keyframes spin { to { transform: rotate(360deg) } }
+.nav-link {
+  color:#ffd3ea;
+  text-decoration:none;
+  font-weight:700;
+  opacity:.95;
+  padding: 6px 10px;
+  border-radius:8px;
+  transition: background .2s ease;
+}
+.nav-link:hover {
+  background: rgba(255,29,142,.15);
+}

@@ -78,7 +78,8 @@ async function renderDiagram() {
   setGraphLoading(true);
   let data;
   try {
-    const res = await fetch('/schema.json');
+    // RELATIV, nu absolut: se respectă prefixul când app-ul e montat sub /apps/nl2sql
+    const res = await fetch('schema.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     data = await res.json();
   } catch (e) {
@@ -90,7 +91,6 @@ async function renderDiagram() {
   const elements = buildElements(data, { focus, showColumns, showEdgeLabels });
 
   const style = [
-    // NODES — roșu primar, glow
     { selector: 'node', style: {
         'shape': 'round-rectangle',
         'background-color': '#151632',
@@ -112,14 +112,12 @@ async function renderDiagram() {
         'shadow-color': '#ff1d8e66',
         'shadow-offset-x': 0, 'shadow-offset-y': 0
     }},
-    // FOCUS — cyan accent
     { selector: 'node.focus', style: {
         'border-color': '#00e5ff',
         'border-width': 4,
         'background-color': '#161b3a',
         'shadow-color': '#00e5ff88'
     }},
-    // EDGES — magenta
     { selector: 'edge', style: {
         'curve-style': 'taxi',
         'taxi-direction': 'auto',
