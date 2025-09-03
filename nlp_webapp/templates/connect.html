@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Conectare la PostgreSQL</h2>
+  <form method="post" action="/connect">
+    <div class="row">
+      <div class="grow">
+        <label>Host</label>
+        <input name="host" value="localhost" />
+      </div>
+      <div>
+        <label>Port</label>
+        <input name="port" value="5432" style="width:120px" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="grow">
+        <label>User</label>
+        <input name="user" value="postgres" />
+      </div>
+      <div class="grow">
+        <label>Parolă</label>
+        <input name="password" type="password" />
+      </div>
+      <div class="grow">
+        <label>Baza</label>
+        <input name="dbname" value="postgres" />
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" type="submit">Conectează</button>
+      {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

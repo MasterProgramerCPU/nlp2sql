@@ -1,0 +1,12 @@
+<div class="card">
+  <div class="muted">Răspuns model</div>
+  <pre>{{ reply | e }}</pre>
+
+  {% if sql and result_id %}
+    <form hx-post="/run" hx-target="#results-{{ result_id }}" hx-swap="innerHTML">
+      <input type="hidden" name="sql" value="{{ sql | e }}" />
+      <button class="btn" type="submit">Rulează SQL</button>
+    </form>
+    <div id="results-{{ result_id }}" class="card"></div>
+  {% endif %}
+</div>

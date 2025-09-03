@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <h2>Conversație</h2>
+      <div class="subtitle">Spune ce vrei din bază — în română. Noi îți generăm SQL-ul ✨</div>
+    </div>
+  </div>
+
+  <!-- Loader-ul va fi afișat DOAR când formularul are clasa .htmx-request -->
+  <form hx-post="/ask" hx-target="#chat" hx-swap="beforeend" class="grow chat-form">
+    <label class="muted">Prompt (în română)</label>
+    <textarea name="prompt" class="input" placeholder="Ex: Top 10 produse pe venit din ultimele 90 zile, cu categorie."></textarea>
+    <div class="row mt">
+      <button class="btn" type="submit">Trimite</button>
+      <div class="loader" aria-hidden="true">
+        <div class="spinner"></div><span>Generez răspunsul…</span>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div id="chat"></div>
+
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <h3>Diagramă ER (interactivă)</h3>
+      <div class="subtitle">Exploră relațiile. Dublu-click pe un tabel pentru focus.</div>
+    </div>
+    <div class="row">
+      <input id="focus-input" class="input slim" placeholder="schema.tabel (focus opțional)" />
+      <button class="btn secondary" type="button" onclick="renderDiagram()">Redesenează</button>
+      <button class="btn ghost" type="button" onclick="graphZoom(-0.2)">Zoom-</button>
+      <button class="btn ghost" type="button" onclick="graphZoom(0.2)">Zoom+</button>
+      <button class="btn ghost" type="button" onclick="graphFit()">Fit</button>
+      <label class="switch">
+        <input id="toggle-columns" type="checkbox" checked onchange="renderDiagram()">
+        <span>Afișează coloanele</span>
+      </label>
+      <label class="switch">
+        <input id="toggle-edge-labels" type="checkbox" checked onchange="renderDiagram()">
+        <span>Etichete FK</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- overlay-ul de loading pentru diagramă rămâne cum era, doar când se încarcă schema -->
+  <div id="cy" class="graph"></div>
+  <div class="muted small">Zoom: rotița • Pan: drag • Focus: dublu-click.</div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => renderDiagram());
+</script>
+{% endblock %}
