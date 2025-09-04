@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>Conversație</h2>
+  <form class="chat-form"
+        hx-post="ask"
+        hx-target="#chat"
+        hx-swap="beforeend">
+    <label class="muted">Prompt (în română)</label>
+    <textarea name="prompt" class="input" placeholder="Ex: Arată-mi comenzile pe ultimele 30 de zile."></textarea>
+    <div class="row mt">
+      <button class="btn" type="submit">Trimite</button>
+      <div class="loader"><div class="spinner"></div><span>Gândesc…</span></div>
+    </div>
+  </form>
+</div>
+
+<div id="chat"></div>
+
+<div class="card">
+  <div class="toolbar">
+    <h3>Diagramă ER (interactivă)</h3>
+    <div class="row">
+      <input id="focus-input" class="input" placeholder="schema.tabel (focus opțional)">
+      <label class="switch"><input id="toggle-columns" type="checkbox" checked> <span>Coloane</span></label>
+      <label class="switch"><input id="toggle-edge-labels" type="checkbox" checked> <span>FK labels</span></label>
+      <button class="btn secondary" type="button" onclick="renderDiagram()">Redesenează</button>
+      <button class="btn secondary" type="button" onclick="graphFit()">Încadrează</button>
+      <button class="btn secondary" type="button" onclick="graphZoom(0.2)">Zoom +</button>
+      <button class="btn secondary" type="button" onclick="graphZoom(-0.2)">Zoom −</button>
+    </div>
+  </div>
+  <div id="cy" class="graph"></div>
+  <div class="muted small">Dublu-click pe un nod pentru focus. Zoom: rotița mouse, pan: drag.</div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => renderDiagram());
+</script>
+
+{% endblock %}

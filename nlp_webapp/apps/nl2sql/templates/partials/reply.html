@@ -1,0 +1,36 @@
+<div class="card reply">
+  {% if error %}
+    <div class="error">Eroare: {{ error }}</div>
+  {% else %}
+    {% if question %}
+      <div class="muted tiny">Întrebare</div>
+      <pre class="blk question">{{ question }}</pre>
+    {% endif %}
+
+    {% if sql %}
+      <h3>SQL propus</h3>
+      <div class="sql-wrap" id="sqlwrap-{{ token }}">
+        <div class="sql-toolbar">
+          <div class="sql-toolbar-left">
+            <span class="muted tiny">read-only</span>
+          </div>
+          <div class="sql-toolbar-right">
+            <button class="btn pill ghost" type="button"
+                    onclick="copySQL('{{ token }}')" title="Copiază SQL">Copy</button>
+            <form class="inline" hx-post="run" hx-target="#results-{{ token }}" hx-swap="innerHTML">
+              <input type="hidden" name="sql" value="{{ sql|e }}">
+              <button class="btn secondary pill" type="submit">Rulează SQL</button>
+            </form>
+          </div>
+        </div>
+        <pre class="blk sql"><code id="sqlcode-{{ token }}">{{ (sql_formatted or sql) }}</code></pre>
+      </div>
+      <div id="results-{{ token }}"></div>
+    {% endif %}
+
+    {% if answer %}
+      <h3>Explicație</h3>
+      <div class="answer md">{{ answer|safe }}</div>
+    {% endif %}
+  {% endif %}
+</div>

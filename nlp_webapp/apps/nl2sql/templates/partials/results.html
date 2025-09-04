@@ -1,0 +1,25 @@
+<div class="card">
+  {% if error %}
+    <div class="error">Eroare la executarea SQL: {{ error }}</div>
+  {% else %}
+    <div class="muted">Rows: {{ rows|length }}{% if duration_ms %} • {{ '%.1f' % duration_ms }} ms{% endif %}</div>
+    {% if rows and cols %}
+      <table>
+        <thead>
+          <tr>
+            {% for c in cols %}<th>{{ c }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              {% for c in cols %}<td>{{ r[c] }}</td>{% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="muted">Nicio înregistrare.</div>
+    {% endif %}
+  {% endif %}
+</div>

@@ -155,3 +155,36 @@ th{ background: #161a3e; color: #ffd3ea; position: sticky; top: 0; z-index: 1; }
 .nav-link:hover {
   background: rgba(255,29,142,.15);
 }
+/* --- Reply formatting --- */
+.card.reply h3{margin:8px 0 6px}
+pre.blk{background:#0b1224;border:1px solid rgba(255,29,142,.22);border-radius:12px;padding:12px 14px;white-space:pre-wrap}
+pre.blk.sql{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+pre.blk.question{opacity:.95}
+.runbar{align-items:center;gap:10px;margin:8px 0 4px}
+
+/* tiny helpers */
+.tiny{font-size:12px}
+
+/* Footer centered properly */
+.footer{ text-align:center; display:block; margin:24px auto 18px; }
+
+/* Cytoscape container sizing (in case it collapsed) */
+.graph{ width:100%; height:600px; min-height:420px; }
+
+/* --- SQL bar & code block --- */
+.sql-wrap{ border:1px solid rgba(255,29,142,.22); border-radius:12px; overflow:hidden; }
+.sql-toolbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; padding:8px 10px; background:#121632; border-bottom:1px solid rgba(255,29,142,.18);
+}
+.sql-toolbar .inline{ display:inline; margin:0 }
+.btn.pill{ border-radius:999px; padding:6px 12px; font-weight:700 }
+.btn.ghost{ background:transparent; border:1px solid rgba(255,29,142,.35); color:#ffd3ea }
+.btn.ghost:hover{ background:rgba(255,29,142,.12) }
+pre.blk.sql{ margin:0; border:0; border-radius:0; }
+
+/* feedback după copy */
+.sql-wrap.copied .sql-toolbar{ box-shadow: inset 0 0 0 2px rgba(0,255,163,.35); }
+
+/* Footer centrat (safety) */
+.footer{ text-align:center; display:block; margin:24px auto 18px; }

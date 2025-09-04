@@ -181,3 +181,39 @@ function graphFit() { if (cy) cy.fit(undefined, 60); }
 window.renderDiagram   = renderDiagram;
 window.graphZoom       = graphZoom;
 window.graphFit        = graphFit;
+
+// ==== HTMX hooks pentru formularul de chat (nu afectează diagrama) ====
+
+document.addEventListener('htmx:beforeRequest', (e) => {
+  const form = e.target.closest('.chat-form');
+  if (form) form.classList.add('htmx-request'); // pornește loader-ul (CSS)
+});
+
+document.addEventListener('htmx:afterOnLoad', (e) => {
+  const form = e.target.closest('.chat-form');
+  if (form) {
+    form.classList.remove('htmx-request');       // oprește loader-ul
+    const ta = form.querySelector('textarea[name="prompt"]');
+    if (ta) ta.value = '';                       // curăță promptul
+    const chat = document.querySelector('#chat');
+    if (chat) chat.scrollTop = chat.scrollHeight; // autoscroll jos
+  }
+});
+
+// ==== Copy-to-clipboard pentru blocul SQL ====
+window.copySQL = async function(token){
+  try {
+    const el = document.getElementById(`sqlcode-${token}`);
+    if (!el) return;
+    const text = el.innerText || el.textContent || '';
+    await navigator.clipboard.writeText(text);
+    // mic feedback vizual
+    const wrap = document.getElementById(`sqlwrap-${token}`);
+    if (!wrap) return;
+    wrap.classList.add('copied');
+    setTimeout(()=>wrap.classList.remove('copied'), 900);
+  } catch (e) {
+    console.warn('Clipboard copy failed', e);
+    alert('Nu am putut copia în clipboard.');
+  }
+};
