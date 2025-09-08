@@ -1,62 +1,67 @@
 <!doctype html>
 <html lang="ro">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DataVerse — Apps</title>
-  <link rel="stylesheet" href="/static/portal.css" />
-  <link rel="preconnect" href="https://unpkg.com">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>DataVerse</title>
+  <link rel="stylesheet" href="/static/portal.css"/>
 </head>
 <body>
-  <header class="nav">
-    <div class="brand">
-      <span class="dot"></span>
-      <div class="brand-stack">
-        <div class="brand-title">DataVerse</div>
-        <div class="brand-sub">Colecția ta de aplicații AI & data</div>
-      </div>
-    </div>
-    <nav class="nav-actions">
-      <a class="nav-link" href="/">Acasă</a>
-      <a class="nav-link" href="/apps/nl2sql/">NL→SQL</a>
-      <span class="chip online">Online</span>
-    </nav>
-  </header>
+<header class="site-nav">
+  <div class="brand">
+    <span class="dot"></span>
+    <span class="brand-title">DataVerse</span>
+  </div>
+  <nav class="nav-actions">
+    <a class="nav-link" href="/">Acasă</a>
+  </nav>
+</header>
 
-  <main class="container">
-    <section class="hero hero-centered">
-      <div class="hero-left">
-        <h1 class="hero-title">Bun venit în DataVerse</h1>
-        <p class="hero-sub">Apps utile în fluxul tău de lucru. Intră, experimentează, combină.</p>
-        <ul class="hero-bullets">
-          <li>⚡ Un singur domeniu, mai multe aplicații</li>
-          <li>🧠 Modele AI rulate prin Ollama</li>
-          <li>🗃️ Conectare sigură la date</li>
-        </ul>
-      </div>
-    </section>
+<main class="wrap">
+  <section class="hero">
+    <h1 class="hero-title">Colecția ta de aplicații AI pentru date</h1>
+    <p class="hero-sub">Alege o aplicație mai jos pentru a începe.</p>
+  </section>
 
-    <section id="apps" class="apps">
-      {% for app in apps %}
-      <a class="app-card" href="{{ app.path }}">
-        <div class="app-card-glow"></div>
-        <div class="app-card-body">
-          <div class="app-card-head">
-            <h3 class="app-title">{{ app.title }}</h3>
-            <span class="badge {{ 'live' if app.status=='live' else 'beta' }}">{{ app.status }}</span>
-          </div>
-          <p class="app-sub">{{ app.subtitle }}</p>
-          <div class="tags">
-            {% for t in app.tags %}<span class="tag">{{ t }}</span>{% endfor %}
-          </div>
+  <section class="apps-grid">
+    <!-- NL→SQL -->
+    <a class="app-card" href="/apps/nl2sql/">
+      <div class="app-card-head">
+        <div class="app-icon">🧠</div>
+        <div class="app-head-txt">
+          <div class="app-title">NL→SQL Assistant</div>
+          <div class="app-sub">Vorbești natural → primești SQL</div>
         </div>
-      </a>
-      {% endfor %}
-    </section>
-  </main>
+      </div>
+      <div class="app-meta">
+        <span class="tag">live</span>
+        <span class="tag ghost">FastAPI</span>
+        <span class="tag ghost">PostgreSQL</span>
+        <span class="tag ghost">Ollama</span>
+      </div>
+    </a>
 
-  <footer class="footer">
-    <div>DataVerse • Creat de Tudor</div>
-  </footer>
+    <!-- PG Config Tuner -->
+    <a class="app-card" href="/apps/pg-tuner/">
+      <div class="app-card-head">
+        <div class="app-icon">🛠️</div>
+        <div class="app-head-txt">
+          <div class="app-title">PG Config Tuner</div>
+          <div class="app-sub">Recomandări Postgres după hardware & scop</div>
+        </div>
+      </div>
+      <div class="app-meta">
+        <span class="tag warn">beta</span>
+        <span class="tag ghost">pg_settings</span>
+        <span class="tag ghost">bgwriter</span>
+        <span class="tag ghost">Ollama</span>
+      </div>
+    </a>
+  </section>
+</main>
+
+<footer class="site-footer">
+  Creat de Tudor
+</footer>
 </body>
 </html>

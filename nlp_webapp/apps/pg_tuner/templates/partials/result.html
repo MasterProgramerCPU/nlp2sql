@@ -1,0 +1,20 @@
+<div class="section-title">Recomandări (heuristici)</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Parametru</th>
+      <th>Valoare sugerată</th>
+      <th>Motiv</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for r in heuristics %}
+    <tr>
+      <td><code>{{ r.name }}</code></td>
+      <td><strong>{{ r.value }}</strong></td>
+      <td class="muted">{{ r.reason }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="muted small mt">Versiune server: {{ version }} · Timeout AI: ~{{ ai_timeout }}s</div>

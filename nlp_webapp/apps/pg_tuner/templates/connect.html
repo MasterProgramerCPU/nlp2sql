@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Conectare — PG Config Tuner{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="toolbar">
+      <div>
+        <h1 class="title"><span class="dot cyan"></span> PG Config Tuner</h1>
+        <div class="muted small">Introdu datele de conectare la PostgreSQL și hardware-ul serverului.</div>
+      </div>
+      <span class="badge">Pasul 1/2</span>
+    </div>
+
+    {% if error %}
+    <div class="alert error">
+      <strong>Eroare de conectare:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- IMPORTANT: action RELATIV (fără /apps/pg-tuner) -->
+    <form method="post" action="connect" class="form-grid">
+      <div class="row">
+        <div class="col">
+          <label class="muted small">Host</label>
+          <input class="input" name="host" placeholder="localhost" value="localhost" required />
+        </div>
+        <div class="col narrow">
+          <label class="muted small">Port</label>
+          <input class="input" name="port" placeholder="5432" value="5432" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label class="muted small">User</label>
+          <input class="input" name="user" placeholder="postgres" value="postgres" required />
+        </div>
+        <div class="col">
+          <label class="muted small">Parolă</label>
+          <input class="input" name="password" type="password" placeholder="••••••••" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label class="muted small">Baza de date</label>
+          <input class="input" name="dbname" placeholder="postgres" value="postgres" required />
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col">
+          <label class="muted small">RAM (GB)</label>
+          <input class="input" name="ram_gb" type="number" min="1" step="1" value="16" />
+        </div>
+        <div class="col">
+          <label class="muted small">CPU cores</label>
+          <input class="input" name="cpu_cores" type="number" min="1" step="1" value="8" />
+        </div>
+        <div class="col">
+          <label class="muted small">SSD</label>
+          <select class="input" name="ssd">
+            <option value="on" selected>Da</option>
+            <option value="">Nu</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row end mt">
+        <button class="btn primary" type="submit">Continuă în tuner</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

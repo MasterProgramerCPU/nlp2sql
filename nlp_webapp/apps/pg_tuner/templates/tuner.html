@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}PG Config Tuner{% endblock %}
+{% block content %}
+<div class="container">
+
+  <div class="card">
+    <div class="toolbar">
+      <div>
+        <h1 class="title"><span class="dot cyan"></span> PG Config Tuner</h1>
+        <div class="muted small">Recomandări pentru parametrii PostgreSQL pe baza hardware-ului și metricalor.</div>
+      </div>
+      <span class="badge">Conectat</span>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label class="muted small">Scopul instanței</label>
+        <select id="goal" class="input">
+          <option value="OLTP">OLTP (tranzacțional)</option>
+          <option value="OLAP">OLAP (analitic)</option>
+          <option value="Mix">Mix</option>
+        </select>
+      </div>
+
+      <div class="btn-group end">
+        <!-- Heuristici -->
+        <form hx-post="tune" hx-target="#result" hx-swap="innerHTML">
+          <input type="hidden" name="goal" id="goal-hidden-heur" />
+          <button class="btn primary" type="submit"
+            onclick="document.getElementById('goal-hidden-heur').value=document.getElementById('goal').value">
+            Generează recomandări
+          </button>
+        </form>
+
+        <!-- AI (un singur buton) -->
+        <form hx-post="ai" hx-target="#ai" hx-swap="innerHTML">
+          <input type="hidden" name="goal" id="goal-hidden-ai" />
+          <button class="btn" type="submit"
+            onclick="document.getElementById('goal-hidden-ai').value=document.getElementById('goal').value">
+            Comentarii AI
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="muted small mt">
+      Sfat: întâi „Generează recomandări”, apoi „Comentarii AI” pentru explicații.
+    </div>
+  </div>
+
+  <div id="result" class="card">
+    <div class="muted">Aici apar recomandările (heuristici) după generare.</div>
+  </div>
+
+  <div id="ai" class="card">
+    <div class="muted">Aici apar comentariile AI (Markdown randat, cu highlight SQL).</div>
+  </div>
+
+</div>
+{% endblock %}

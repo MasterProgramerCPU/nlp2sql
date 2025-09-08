@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}PG Config Tuner{% endblock %}</title>
+
+  <!-- IMPORTANT: relativ la sub-app; devine /apps/pg-tuner/static/tuner.css -->
+  <link rel="stylesheet" href="static/tuner.css" />
+
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/"><span class="dot cyan"></span> Portal</a>
+      <nav class="nav">
+        <a class="nav-link" href="/apps/nl2sql/chat">NL→SQL</a>
+        <a class="nav-link active" href="/apps/pg-tuner/">PG Tuner</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer-note">Creat de Tudor</footer>
+</body>
+</html>
