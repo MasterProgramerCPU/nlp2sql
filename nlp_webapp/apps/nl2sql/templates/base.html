@@ -1,58 +1,40 @@
 <!doctype html>
 <html lang="ro">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NL→SQL Assistant</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}NL→SQL Assistant{% endblock %}</title>
 
-  <link rel="stylesheet" href="{{ request.url_for('nl2sqlstatic', path='style.css') }}" />
+  <!-- CSS local al aplicației (RELATIV, ca în pg_tuner) -->
+  <link rel="stylesheet" href="static/style.css"/>
 
-  <!-- HTMX pentru submit AJAX -->
-  <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
-
-  <!-- Cytoscape + dagre pentru diagramă -->
-  <script src="https://unpkg.com/cytoscape@3.28.0/dist/cytoscape.min.js" defer></script>
+  <!-- Biblioteci folosite în NL→SQL -->
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js" defer></script>
   <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js" defer></script>
   <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js" defer></script>
 
-  <!-- JS-ul app-ului (diagrama + hooks HTMX) -->
-  <script src="{{ request.url_for('nl2sqlstatic', path='app.js') }}" defer></script>
-
-  <!-- Mic CSS pentru loaderul din formularul de chat -->
-  <style>
-    .loader { display:none; align-items:center; gap:8px; color:#ffd3ea; margin-left:8px }
-    .chat-form.htmx-request .loader { display:flex }
-    .spinner{ width:18px; height:18px; border-radius:50%; border:3px solid rgba(255,29,142,.3); border-top-color:#ff1d8e; animation:spin 1s linear infinite }
-    @keyframes spin{ to{ transform: rotate(360deg) } }
-    /* loader pe grafic */
-    #cy.is-loading { position: relative; }
-    #cy .spinner-abs { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-    #cy .spinner-abs::after{
-      content:""; width:28px; height:28px; border-radius:50%;
-      border:3px solid rgba(255,29,142,.35); border-top-color:#ff1d8e; animation:spin 1s linear infinite;
-    }
-  </style>
+  <!-- JS local al aplicației (RELATIV) -->
+  <script src="static/app.js" defer></script>
 </head>
 <body>
-<header class="nav">
+
+<header class="site-nav">
   <div class="brand">
     <span class="dot"></span>
-    <div class="brand-stack">
-      <div class="brand-title">NL→SQL Assistant</div>
-      <div class="brand-sub">Vorbești natural • primești SQL</div>
-    </div>
+    <span class="brand-title">DataVerse</span>
   </div>
   <nav class="nav-actions">
-    <a class="nav-link" href="/">🏠 Home</a>
-    <a class="nav-link" href="{{ request.url_for('index') }}">Conectare</a>
-    <a class="nav-link" href="{{ request.url_for('chat') }}">Chat</a>
+    <a class="nav-link" href="/">Acasă</a>
+    <a class="nav-link active" href="/apps/nl2sql/">NL→SQL</a>
+    <a class="nav-link" href="/apps/pg-tuner/">PG Tuner</a>
   </nav>
 </header>
 
-<main class="container">
+<main class="wrap">
   {% block content %}{% endblock %}
 </main>
 
-<footer class="footer">NL→SQL • Creat de Tudor</footer>
+<footer class="footer">Creat de Tudor</footer>
 </body>
 </html>

@@ -12,55 +12,58 @@
     </div>
 
     {% if error %}
-    <div class="alert error">
+    <div class="card danger">
       <strong>Eroare de conectare:</strong> {{ error }}
     </div>
     {% endif %}
 
-    <!-- IMPORTANT: action RELATIV (fără /apps/pg-tuner) -->
     <form method="post" action="connect" class="form-grid">
+      <!-- row 1 -->
       <div class="row">
         <div class="col">
-          <label class="muted small">Host</label>
+          <label class="label">Host</label>
           <input class="input" name="host" placeholder="localhost" value="localhost" required />
         </div>
         <div class="col narrow">
-          <label class="muted small">Port</label>
+          <label class="label">Port</label>
           <input class="input" name="port" placeholder="5432" value="5432" required />
         </div>
       </div>
 
+      <!-- row 2 -->
       <div class="row">
         <div class="col">
-          <label class="muted small">User</label>
+          <label class="label">User</label>
           <input class="input" name="user" placeholder="postgres" value="postgres" required />
         </div>
         <div class="col">
-          <label class="muted small">Parolă</label>
+          <label class="label">Parolă</label>
           <input class="input" name="password" type="password" placeholder="••••••••" />
         </div>
       </div>
 
+      <!-- row 3 -->
       <div class="row">
         <div class="col">
-          <label class="muted small">Baza de date</label>
+          <label class="label">Baza de date</label>
           <input class="input" name="dbname" placeholder="postgres" value="postgres" required />
         </div>
       </div>
 
       <hr />
 
+      <!-- row 4 -->
       <div class="row">
         <div class="col">
-          <label class="muted small">RAM (GB)</label>
+          <label class="label">RAM (GB)</label>
           <input class="input" name="ram_gb" type="number" min="1" step="1" value="16" />
         </div>
         <div class="col">
-          <label class="muted small">CPU cores</label>
+          <label class="label">CPU cores</label>
           <input class="input" name="cpu_cores" type="number" min="1" step="1" value="8" />
         </div>
         <div class="col">
-          <label class="muted small">SSD</label>
+          <label class="label">SSD</label>
           <select class="input" name="ssd">
             <option value="on" selected>Da</option>
             <option value="">Nu</option>

@@ -51,6 +51,29 @@ def try_hosts() -> List[str]:
             cand.append(h)
     return cand
 
+def render_postgresql_conf(heuristics: list[dict], header: str = "") -> str:
+    """
+    Construieste un postgresql.conf minimal din lista de recomandări:
+    - fiecare parametru pe linie: name = value
+    - motivul este pus ca # comentariu înaintea liniei
+    """
+    lines = []
+    if header:
+        for hline in header.splitlines():
+            lines.append(f"# {hline}")
+        lines.append("")
+    for r in heuristics:
+        name  = str(r.get("name", "")).strip()
+        value = str(r.get("value", "")).strip()
+        reason = str(r.get("reason", "")).strip()
+        if reason:
+            lines.append(f"# {reason}")
+        # valori ca 4GB, 512MB, 0.9, 200 etc. — fără ghilimele
+        lines.append(f"{name} = {value}")
+        lines.append("")
+    return "\n".join(lines).rstrip()
+
+
 def first_alive_host(timeout: float = 1.5) -> Optional[str]:
     # încercăm mai întâi API-ul Ollama nativ
     for base in try_hosts():
@@ -520,6 +543,31 @@ def ai(request: Request, goal: str = Form(...)):
     stats = fetch_settings_and_stats(STATE["dsn"])
     ai_text = ai_recommendations_streamed(goal, hw, stats)
     return templates.TemplateResponse("partials/ai.html", {"request": request, "ai": ai_text})
+
+
+@app.post("/conf", response_class=HTMLResponse)
+def conf(request: Request, goal: str = Form(...)):
+    """
+    Generează un postgresql.conf gata de copy-paste din recomandările curente (heuristici).
+    Recalculează rapid recomandările (ca /tune), apoi le transformă în .conf.
+    """
+    if not STATE.get("dsn"):
+        raise HTTPException(400, "Neconectat la DB")
+
+    hw = dict(STATE.get("hw") or {})
+    hw["goal"] = goal
+
+    stats = fetch_settings_and_stats(STATE["dsn"])
+    heuristics = basic_tune(hw, goal, stats.get("settings", []), stats.get("server_version_num", 120000))
+
+    header = f"Generat de PG Config Tuner — scop: {goal} — version={stats.get('server_version_num')}"
+    conf_text = render_postgresql_conf(heuristics, header=header)
+
+    return templates.TemplateResponse("partials/conf.html", {
+        "request": request,
+        "conf_text": conf_text
+    })
+
 
 # ─── diag
 @app.get("/ollama/ping")

@@ -5,26 +5,30 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{% block title %}PG Config Tuner{% endblock %}</title>
 
-  <!-- IMPORTANT: relativ la sub-app; devine /apps/pg-tuner/static/tuner.css -->
+  <!-- CSS-ul propriu al PG Tuner -->
   <link rel="stylesheet" href="static/tuner.css" />
 
+  <!-- HTMX pentru formulare -->
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/"><span class="dot cyan"></span> Portal</a>
-      <nav class="nav">
-        <a class="nav-link" href="/apps/nl2sql/chat">NL→SQL</a>
-        <a class="nav-link active" href="/apps/pg-tuner/">PG Tuner</a>
-      </nav>
-    </div>
-  </header>
 
-  <main class="page">
-    {% block content %}{% endblock %}
-  </main>
+<header class="site-nav">
+  <div class="brand">
+    <span class="dot"></span>
+    <span class="brand-title">DataVerse</span>
+  </div>
+  <nav class="nav-actions">
+    <a class="nav-link" href="/">Acasă</a>
+    <a class="nav-link" href="/apps/nl2sql/">NL→SQL</a>
+    <a class="nav-link active" href="/apps/pg-tuner/">PG Tuner</a>
+  </nav>
+</header>
 
-  <footer class="footer-note">Creat de Tudor</footer>
+<main class="page">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer-note">Creat de Tudor</footer>
 </body>
 </html>

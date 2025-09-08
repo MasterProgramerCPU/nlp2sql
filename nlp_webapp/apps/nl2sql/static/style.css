@@ -188,3 +188,101 @@ pre.blk.sql{ margin:0; border:0; border-radius:0; }
 
 /* Footer centrat (safety) */
 .footer{ text-align:center; display:block; margin:24px auto 18px; }
+
+/* ===== Header: identic cu portal/pg_tuner (site-nav) ===== */
+.site-nav{
+  position: sticky; top:0; z-index: 100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 16px;
+  background: rgba(10,14,28,.72);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-bottom: 1px solid #1a2748;
+  box-shadow: 0 8px 26px rgba(0,0,0,.28);
+}
+.site-nav .brand{
+  display:flex; align-items:center; gap:10px;
+  font-weight: 800; color: #e6f0ff; /* ajustează dacă ai tokens */
+  letter-spacing:.2px;
+}
+.site-nav .brand .dot{
+  width:10px; height:10px; border-radius:50%;
+  background: #00e5ff; /* accent cyan */
+  box-shadow: 0 0 10px #00e5ff88;
+}
+.site-nav .brand .brand-title{
+  font-size: 16px;
+}
+.site-nav .nav-actions{
+  display:flex; align-items:center; gap:10px;
+}
+.site-nav .nav-link{
+  display:inline-flex; align-items:center; gap:8px;
+  padding: 8px 12px;
+  color: #bcd1ff; /* muted */
+  text-decoration:none;
+  border:1px solid transparent;
+  border-radius: 12px;
+  transition: border .15s ease, background .15s ease, color .15s ease;
+}
+.site-nav .nav-link:hover{
+  color:#f6f9ff;
+  border-color:#2a3c72;
+  background:#0f1734;
+}
+.site-nav .nav-link.active{
+  color:#fff;
+  border-color:#2a3c72;
+  background:#101a3e;
+}
+/* ===== Header: site-nav (append-only, nu atinge restul stilurilor) ===== */
+:root{
+  --nl2sql-text: #e6f0ff;
+  --nl2sql-muted:#bcd1ff;
+  --nl2sql-border:#1a2748;
+  --nl2sql-accent:#00e5ff;
+}
+
+.site-nav{
+  position: sticky; top:0; z-index: 100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 16px;
+  background: rgba(10,14,28,.72);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-bottom: 1px solid var(--nl2sql-border);
+  box-shadow: 0 8px 26px rgba(0,0,0,.28);
+}
+.site-nav .brand{
+  display:flex; align-items:center; gap:10px;
+  font-weight: 800; color: var(--nl2sql-text);
+  letter-spacing:.2px; user-select:none;
+}
+.site-nav .brand .dot{
+  width:10px; height:10px; border-radius:50%;
+  background: var(--nl2sql-accent);
+  box-shadow: 0 0 10px rgba(0,229,255,.5);
+}
+.site-nav .brand .brand-title{ font-size: 16px; }
+
+.site-nav .nav-actions{ display:flex; align-items:center; gap:10px; }
+.site-nav .nav-link{
+  display:inline-flex; align-items:center; gap:8px;
+  padding: 8px 12px;
+  color: var(--nl2sql-muted);
+  text-decoration:none;
+  border:1px solid transparent;
+  border-radius: 12px;
+  transition: border .15s ease, background .15s ease, color .15s ease;
+}
+.site-nav .nav-link:hover{
+  color:#f6f9ff;
+  border-color:#2a3c72;
+  background:#0f1734;
+}
+.site-nav .nav-link.active{
+  color:#fff;
+  border-color:#2a3c72;
+  background:#101a3e;
+}
+
+/* Protecție: dacă aveai .topbar, nu o mai afișăm ca să nu dubleze header-ul */
+.topbar{ display:none !important; }

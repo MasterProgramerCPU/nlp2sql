@@ -1,0 +1,27 @@
+<div class="md-card">
+  <div class="md-header">
+    <span class="dot cyan"></span>
+    <strong>postgresql.conf (generat din recomandări)</strong>
+    <button class="btn" style="margin-left:auto" onclick="copyConf()">Copiază</button>
+  </div>
+  <div class="md-content">
+    <pre><code class="language-ini" id="conf-text">{{ conf_text }}</code></pre>
+    <div class="muted small">Verifică compatibilitatea unităților (MB/GB) cu versiunea ta și particularitățile de workload.</div>
+  </div>
+</div>
+
+<script>
+function copyConf(){
+  const el = document.getElementById('conf-text');
+  if(!el) return;
+  const txt = el.innerText || el.textContent || '';
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = event?.target;
+    if (btn) {
+      const old = btn.textContent;
+      btn.textContent = 'Copiat!';
+      setTimeout(()=>btn.textContent=old, 1200);
+    }
+  });
+}
+</script>

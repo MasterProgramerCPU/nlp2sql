@@ -12,7 +12,9 @@ from fastapi.templating import Jinja2Templates
 # ────────────────────────────── App setup ──────────────────────────────
 app = FastAPI(title="NL→SQL Assistant")
 BASE = os.path.dirname(__file__)
-app.mount("/nl2sqlstatic", StaticFiles(directory=os.path.join(BASE, "static")), name="nl2sqlstatic")
+# Mount static under /static so URLs like
+# /apps/nl2sql/static/... resolve correctly from templates
+app.mount("/static", StaticFiles(directory=os.path.join(BASE, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE, "templates"))
 
 # ────────────────────────────── State & Config ─────────────────────────
