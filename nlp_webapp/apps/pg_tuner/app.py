@@ -496,6 +496,10 @@ def ai_recommendations_streamed(goal: str, hw: Dict[str, Any], stats: Dict[str, 
 def home(request: Request):
     return templates.TemplateResponse("connect.html", {"request": request})
 
+@app.get("/guide", response_class=HTMLResponse)
+def guide(request: Request):
+    return templates.TemplateResponse("guide.html", {"request": request})
+
 @app.post("/connect", response_class=HTMLResponse)
 def connect(request: Request,
             host: str = Form(...), port: str = Form(...),

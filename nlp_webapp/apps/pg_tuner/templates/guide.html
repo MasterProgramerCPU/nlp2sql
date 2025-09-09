@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Ghid — PG Config Tuner{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>Ghid de utilizare — PG Config Tuner</h2>
+  <div class="subtitle">Recomandări de parametri Postgres pe baza hardware-ului și metricalor</div>
+
+  <h3 class="mt">Pași rapizi</h3>
+  <ol class="muted">
+    <li>Conectează-te la baza de date și completează hardware-ul (RAM, CPU, SSD) + scop (OLTP/OLAP/Mix).</li>
+    <li>Apasă „Generează recomandări” pentru valori de bază (heuristici).</li>
+    <li>„Generază postgresql.conf” produce un fișier text cu setările propuse.</li>
+    <li>„Comentarii AI” adaugă explicații (opțional, necesită Ollama activ).</li>
+  </ol>
+
+  <h3 class="mt">Note importante</h3>
+  <ul class="muted">
+    <li>Recomandările sunt un <strong>punct de pornire</strong>; măsoară și ajustează.</li>
+    <li>Nu aplică automat setările. Copiază în <code>postgresql.conf</code>, apoi restart.</li>
+    <li>AI folosește un model local (Ollama); dacă nu e disponibil, apare text explicativ.</li>
+  </ul>
+
+  <h3 class="mt">Parametri obișnuiți</h3>
+  <ul class="muted">
+    <li><code>shared_buffers</code>, <code>effective_cache_size</code>, <code>work_mem</code>, <code>maintenance_work_mem</code></li>
+    <li><code>random_page_cost</code>, <code>effective_io_concurrency</code></li>
+    <li><code>checkpoint_completion_target</code></li>
+  </ul>
+
+  <div class="muted small mt">Întoarcere la aplicație: linkul „Acasă” sau închide acest ghid.</div>
+</div>
+
+{% endblock %}
+

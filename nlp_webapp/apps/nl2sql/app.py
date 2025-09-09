@@ -27,9 +27,13 @@ STATE: Dict[str, Any] = {
 }
 
 # Ollama
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
 MODEL       = os.getenv("OLLAMA_MODEL", "qwen2.5:7b-instruct")
 NUM_CTX     = int(os.getenv("NUM_CTX", "16384"))
+
+# Robust session (avoid env proxies that may interfere)
+SESSION = requests.Session()
+SESSION.trust_env = False
 
 # ────────────────────────────── Helpers ────────────────────────────────
 SQL_BLOCK   = re.compile(r"```sql\s*(.*?)\s*```", re.I | re.S)
@@ -61,6 +65,130 @@ def format_sql(s: Optional[str]) -> Optional[str]:
 def extract_sql(text: str) -> Optional[str]:
     m = SQL_BLOCK.search(text or "")
     return m.group(1).strip() if m else None
+
+# ────────────────────────────── Ollama helpers (fallbacks) ─────────────
+def _try_hosts() -> List[str]:
+    env_host = os.getenv("OLLAMA_HOST", "").rstrip("/")
+    cand: List[str] = []
+    if env_host:
+        cand.append(env_host)
+    for h in ("http://127.0.0.1:11434", "http://localhost:11434"):
+        if h not in cand:
+            cand.append(h)
+    return cand
+
+def _first_alive_host(timeout: float = 1.5) -> Optional[str]:
+    for base in _try_hosts():
+        try:
+            r = SESSION.get(f"{base}/api/tags", timeout=timeout)
+            if r.ok:
+                return base
+        except Exception:
+            continue
+    for base in _try_hosts():
+        try:
+            r = SESSION.get(f"{base}/v1/models", timeout=timeout)
+            if r.ok:
+                return base
+        except Exception:
+            continue
+    return None
+
+def _list_models(base: str, timeout: float = 2.0) -> List[str]:
+    try:
+        r = SESSION.get(f"{base}/api/tags", timeout=timeout)
+        if r.ok:
+            data = r.json() or {}
+            return [m.get("name") for m in data.get("models", []) if m.get("name")]
+    except Exception:
+        pass
+    try:
+        r = SESSION.get(f"{base}/v1/models", timeout=timeout)
+        if r.ok:
+            data = r.json() or {}
+            return [m.get("id") for m in data.get("data", []) if m.get("id")]
+    except Exception:
+        pass
+    return []
+
+_PREFERRED = [
+    "qwen2.5:7b-instruct",
+    "qwen2.5:3b-instruct",
+    "llama3.2:3b-instruct",
+    "mistral:7b-instruct",
+    "phi3:3.8b-mini-instruct",
+]
+
+def _resolve_model(base: str) -> Optional[str]:
+    env_model = os.getenv("OLLAMA_MODEL", "").strip()
+    models = _list_models(base)
+    if not models:
+        return None
+    if env_model and env_model in models:
+        return env_model
+    for m in _PREFERRED:
+        if m in models:
+            return m
+    return models[0]
+
+def _join_messages_as_prompt(messages: List[Dict[str, str]]) -> str:
+    system = "\n".join(m["content"] for m in messages if m.get("role") == "system").strip()
+    convo: List[str] = []
+    for m in messages:
+        role = m.get("role")
+        if role == "system":
+            continue
+        label = "User" if role == "user" else "Assistant"
+        convo.append(f"{label}: {m.get('content','')}")
+    joined = "\n".join(convo).strip()
+    return f"System: {system}\n{joined}\nAssistant:" if system else f"{joined}\nAssistant:"
+
+def _call_ai(messages, stream: bool, num_predict: int, num_ctx: int, budget_seconds: float = 25.0) -> str:
+    base = _first_alive_host(timeout=1.5) or OLLAMA_HOST
+    model = _resolve_model(base)
+    if not model:
+        return "(AI indisponibil) Niciun model Ollama instalat sau endpoint inactiv."
+    opts = {"num_ctx": num_ctx, "temperature": 0.2, "num_predict": num_predict}
+    # 1) /api/chat
+    try:
+        body = {"model": model, "messages": messages, "options": opts, "stream": stream}
+        r = SESSION.post(f"{base}/api/chat", json=body, timeout=(2, budget_seconds))
+        if r.status_code == 404:
+            raise requests.HTTPError("404", response=r)
+        r.raise_for_status()
+        return (r.json().get("message") or {}).get("content", "").strip()
+    except Exception:
+        pass
+    # 2) /api/generate
+    try:
+        body = {"model": model, "prompt": _join_messages_as_prompt(messages), "options": opts, "stream": stream}
+        r = SESSION.post(f"{base}/api/generate", json=body, timeout=(2, budget_seconds))
+        if r.status_code == 404:
+            raise requests.HTTPError("404", response=r)
+        r.raise_for_status()
+        return r.json().get("response", "").strip()
+    except Exception:
+        pass
+    # 3) /v1/chat/completions
+    try:
+        body = {"model": model, "messages": messages, "stream": False, "temperature": 0.2, "max_tokens": num_predict}
+        r = SESSION.post(f"{base}/v1/chat/completions", json=body, timeout=(2, budget_seconds))
+        if r.status_code == 404:
+            raise requests.HTTPError("404", response=r)
+        r.raise_for_status()
+        data = r.json()
+        return (((data.get("choices") or [{}])[0]).get("message") or {}).get("content", "").strip()
+    except Exception:
+        pass
+    # 4) /v1/completions
+    try:
+        body = {"model": model, "prompt": _join_messages_as_prompt(messages), "stream": False, "temperature": 0.2, "max_tokens": num_predict}
+        r = SESSION.post(f"{base}/v1/completions", json=body, timeout=(2, budget_seconds))
+        r.raise_for_status()
+        data = r.json()
+        return (((data.get("choices") or [{}])[0]).get("text") or "").strip() or "(AI răspuns gol)"
+    except Exception as e:
+        return f"(AI indisponibil) {e}"
 
 def connect_ok(dsn: str) -> None:
     with psycopg.connect(dsn, autocommit=True) as conn:
@@ -138,6 +266,10 @@ async def index(request: Request):
 @app.get("/chat", response_class=HTMLResponse)
 async def chat(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request})
+
+@app.get("/guide", response_class=HTMLResponse)
+async def guide(request: Request):
+    return templates.TemplateResponse("guide.html", {"request": request})
 
 # ────────────────────────────── Connect / Schema ───────────────────────
 @app.post("/connect", response_class=HTMLResponse)
@@ -217,21 +349,10 @@ async def ask(request: Request, prompt: str = Form(...)):
         {json.dumps(schema_hint, ensure_ascii=False)}
         """).strip()
 
-        r = requests.post(f"{OLLAMA_HOST.rstrip('/')}/api/chat", json={
-            "model": MODEL,
-            "messages": [
-                {"role": "system", "content": sys},
-                {"role": "user", "content": user_msg}
-            ],
-            "options": {
-                "temperature": 0.1,
-                "top_p": 0.9,
-                "num_ctx": NUM_CTX
-            },
-            "stream": False
-        }, timeout=180)
-        r.raise_for_status()
-        content = r.json()["message"]["content"]
+        content = _call_ai([
+            {"role": "system", "content": sys},
+            {"role": "user", "content": user_msg},
+        ], stream=False, num_predict=768, num_ctx=NUM_CTX)
 
         maybe_sql = extract_sql(content)
         pretty_sql = format_sql(maybe_sql)

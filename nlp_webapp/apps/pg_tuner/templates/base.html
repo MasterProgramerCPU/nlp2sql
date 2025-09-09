@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{% block title %}PG Config Tuner{% endblock %}</title>
 
-  <!-- CSS-ul propriu al PG Tuner -->
-  <link rel="stylesheet" href="static/tuner.css" />
+  <!-- CSS în același stil ca NL→SQL, cu paletă violet/cyan -->
+  <link rel="stylesheet" href="static/style.css" />
 
   <!-- HTMX pentru formulare -->
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
@@ -20,8 +20,6 @@
   </div>
   <nav class="nav-actions">
     <a class="nav-link" href="/">Acasă</a>
-    <a class="nav-link" href="/apps/nl2sql/">NL→SQL</a>
-    <a class="nav-link active" href="/apps/pg-tuner/">PG Tuner</a>
   </nav>
 </header>
 
@@ -30,5 +28,6 @@
 </main>
 
 <footer class="footer-note">Creat de Tudor</footer>
+<a class="help-fab" href="guide" title="Ghid">?</a>
 </body>
 </html>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Conectare la PostgreSQL (opțional)</h2>
+  <p class="muted">Conexiunea e folosită doar ca context; aplicația nu execută DDL.</p>
+  <form method="post" action="connect">
+    <div class="row">
+      <div class="grow">
+        <label>Host</label>
+        <input class="input" name="host" value="localhost" />
+      </div>
+      <div>
+        <label>Port</label>
+        <input class="input" name="port" value="5432" style="width:140px" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="grow">
+        <label>User</label>
+        <input class="input" name="user" value="postgres" />
+      </div>
+      <div class="grow">
+        <label>Parolă</label>
+        <input class="input" name="password" type="password" />
+      </div>
+      <div class="grow">
+        <label>Baza</label>
+        <input class="input" name="dbname" value="postgres" />
+      </div>
+    </div>
+    <div class="row mt">
+      <button class="btn" type="submit">Continuă la designer</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

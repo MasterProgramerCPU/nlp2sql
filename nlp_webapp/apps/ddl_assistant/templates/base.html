@@ -3,19 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>{% block title %}NL→SQL Assistant{% endblock %}</title>
-
-  <!-- CSS local al aplicației (RELATIV, ca în pg_tuner) -->
+  <title>{% block title %}DDL Assistant{% endblock %}</title>
   <link rel="stylesheet" href="static/style.css"/>
-
-  <!-- Biblioteci folosite în NL→SQL -->
   <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
-  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js" defer></script>
-  <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js" defer></script>
-  <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js" defer></script>
-
-  <!-- JS local al aplicației (RELATIV) -->
-  <script src="static/app.js" defer></script>
 </head>
 <body>
 
@@ -31,6 +21,8 @@
 
 <main class="wrap">
   {% block content %}{% endblock %}
+  <div class="muted small mt">Notă: aplicația propune DDL; nu execută comenzi în DB.</div>
+  <div class="muted small">Model: {{ model if model is defined else '' }}</div>
 </main>
 
 <footer class="footer">Creat de Tudor</footer>

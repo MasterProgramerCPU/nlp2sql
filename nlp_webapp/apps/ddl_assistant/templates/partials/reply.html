@@ -1,0 +1,22 @@
+<div class="card">
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% else %}
+    <div class="row">
+      <h3 class="grow">DDL propus</h3>
+      <span class="muted">Model: {{ model }}</span>
+    </div>
+    {% if ddl %}
+      <pre class="code"><code>{{ ddl }}</code></pre>
+    {% else %}
+      <div class="muted">Nu am detectat un bloc ```sql``` în răspuns.</div>
+    {% endif %}
+    {% if notes %}
+      <div class="mt">
+        <h4>Note</h4>
+        <div class="muted small">{{ notes|safe }}</div>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+

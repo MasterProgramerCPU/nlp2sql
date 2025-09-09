@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h2>Descriere DDL</h2>
+  <form class="chat-form"
+        hx-post="generate"
+        hx-target="#ddl-out"
+        hx-swap="innerHTML">
+    <label class="muted">Descrie entitățile, câmpurile, relațiile (FK) și constrângerile.</label>
+    <textarea name="spec" class="input" rows="10" placeholder="Ex.: Avem clienți și comenzi... include PK, FK, indici pentru căutare după email și data comenzii."></textarea>
+    <div class="row mt">
+      <button class="btn" type="submit">Generează DDL</button>
+      <div class="loader"><div class="spinner"></div><span>Gândesc…</span></div>
+    </div>
+  </form>
+</div>
+
+<div id="ddl-out"></div>
+
+{% endblock %}
+

@@ -1,8 +1,9 @@
 :root{
   --bg:#0b0d17; --bg2:#0c1024; --panel:#121636; --panel2:#0f1430;
   --text:#f5f7ff; --muted:#b1b8d6;
-  --primary:#ff1d8e; --accent:#00e5ff; --ok:#00ffa3; --warn:#ffb703;
-  --border: rgba(255,29,142,.22);
+  /* Unique portal palette (lime/sky) distinct from app themes */
+  --primary:#a8ff60; --accent:#5aa2ff; --ok:#00ffa3; --warn:#ffb703;
+  --border: rgba(168,255,96,.22);
 }
 
 *{box-sizing:border-box}
@@ -21,16 +22,16 @@ body{
   position:sticky; top:0; z-index:10;
   display:flex; align-items:center; justify-content:space-between; gap:16px;
   padding:14px 18px;
-  background: linear-gradient(90deg, rgba(255,29,142,.16), rgba(0,229,255,.10)), linear-gradient(90deg,#0f0f28,#10163a);
-  border-bottom:1px solid rgba(255,29,142,.28);
+  background: linear-gradient(90deg, rgba(168,255,96,.16), rgba(90,162,255,.10)), linear-gradient(90deg,#0f0f28,#10163a);
+  border-bottom:1px solid rgba(168,255,96,.28);
   box-shadow:0 10px 26px rgba(0,0,0,.35);
 }
 .brand{display:flex; align-items:center; gap:10px}
 .dot{width:10px; height:10px; border-radius:50%; background:var(--primary); box-shadow:0 0 14px var(--primary)}
 .brand-title{font-weight:900; letter-spacing:.3px}
 .nav-actions{display:flex; gap:10px}
-.nav-link{color:#ffd3ea; text-decoration:none; padding:6px 10px; border-radius:8px; font-weight:700}
-.nav-link:hover{background:rgba(255,29,142,.16)}
+.nav-link{color:#eaffea; text-decoration:none; padding:6px 10px; border-radius:8px; font-weight:700}
+.nav-link:hover{background:rgba(168,255,96,.16)}
 
 /* LAYOUT */
 .wrap{max-width:1100px; margin:28px auto 24px; padding:0 16px}
@@ -50,19 +51,19 @@ body{
   background: linear-gradient(180deg, var(--panel), var(--panel2));
   border:1px solid var(--border);
   border-radius:16px; padding:16px;
-  box-shadow: 0 10px 28px rgba(255,29,142,.10);
+  box-shadow: 0 10px 28px rgba(90,162,255,.10);
   transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
 }
 .app-card:hover{
   transform: translateY(-2px);
-  border-color: rgba(0,229,255,.35);
-  box-shadow: 0 14px 34px rgba(0,229,255,.14);
+  border-color: rgba(90,162,255,.35);
+  box-shadow: 0 14px 34px rgba(90,162,255,.14);
 }
 .app-card-head{display:flex; gap:12px; align-items:center; margin-bottom:8px}
 .app-icon{
   width:40px; height:40px; border-radius:12px; display:grid; place-items:center;
-  background: radial-gradient(120% 120% at 30% 10%, rgba(255,29,142,.35), rgba(0,229,255,.18));
-  border:1px solid rgba(255,29,142,.30);
+  background: radial-gradient(120% 120% at 30% 10%, rgba(168,255,96,.35), rgba(90,162,255,.18));
+  border:1px solid rgba(168,255,96,.30);
   font-size:22px;
 }
 .app-head-txt{display:flex; flex-direction:column; gap:2px}
@@ -75,7 +76,7 @@ body{
   background: var(--primary); color:#071019;
 }
 .tag.ghost{
-  background: transparent; color:#ffd3ea; border:1px solid rgba(255,29,142,.35);
+  background: transparent; color:#eaffea; border:1px solid rgba(168,255,96,.35);
 }
 .tag.warn{
   background: var(--warn); color:#1a1200;
@@ -86,3 +87,27 @@ body{
   text-align:center; color:var(--muted);
   margin:28px auto 24px;
 }
+
+/* Variants per app: override accent colors within each card */
+.app-card.app-nl2sql{ --primary:#ff1d8e; --accent:#00e5ff; --border: rgba(255,29,142,.22); }
+.app-card.app-pg     { --primary:#7c8aff; --accent:#00e5ff; --border: rgba(124,138,255,.22); }
+.app-card.app-ddl    { --primary:#ffb74d; --accent:#26c6da; --border: rgba(255,183,77,.22); }
+
+/* Use variant colors on hover */
+.app-card.app-pg:hover  { border-color: rgba(124,138,255,.35); box-shadow: 0 14px 34px rgba(124,138,255,.14); }
+.app-card.app-ddl:hover { border-color: rgba(38,198,218,.35);  box-shadow: 0 14px 34px rgba(38,198,218,.14); }
+
+/* Variant icon styling */
+.app-card.app-pg .app-icon{
+  background: radial-gradient(120% 120% at 30% 10%, rgba(124,138,255,.35), rgba(0,229,255,.18));
+  border-color: rgba(124,138,255,.30);
+}
+.app-card.app-ddl .app-icon{
+  background: radial-gradient(120% 120% at 30% 10%, rgba(255,183,77,.35), rgba(38,198,218,.18));
+  border-color: rgba(255,183,77,.30);
+}
+
+/* Variant ghost tags */
+.app-card .tag{ background: var(--primary); color:#071019; }
+.app-card.app-pg .tag.ghost { border-color: rgba(124,138,255,.35); color:#dfe3ff; }
+.app-card.app-ddl .tag.ghost{ border-color: rgba(255,183,77,.35); color:#ffe4b3; }

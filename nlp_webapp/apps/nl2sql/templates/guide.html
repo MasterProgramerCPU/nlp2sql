@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Ghid — NL→SQL{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>Ghid de utilizare — NL→SQL Assistant</h2>
+  <div class="subtitle">Vorbești în română → primești SQL (doar SELECT)</div>
+
+  <h3 class="mt">Pași rapizi</h3>
+  <ol class="muted">
+    <li>Conectează-te la PostgreSQL din pagina „Conectare”.</li>
+    <li>Deschide „Conversație”, scrie cerința în română (ex.: „Top 10 produse pe ultimele 30 de zile”).</li>
+    <li>AI generează un bloc <code>```sql</code>; îl poți copia sau rula (doar SELECT, read-only + timeout).</li>
+    <li>Vezi rezultatele și, opțional, diagrama ER (Cytoscape) pentru a înțelege relațiile.</li>
+  </ol>
+
+  <h3 class="mt">Sfat: cum formulezi cerința</h3>
+  <ul class="muted">
+    <li>Menționează tabele/coloane, perioade, filtre („unde status = 'active'”).</li>
+    <li>Spune clar agregările: „număr”, „sumă”, „medie”, „grupat pe”.</li>
+    <li>Ex.: „Suma comenzilor pe lună, în 2024, grupat pe client”.</li>
+  </ul>
+
+  <h3 class="mt">Limitări și siguranță</h3>
+  <ul class="muted">
+    <li>Execuție doar <strong>SELECT</strong>; orice DDL/DML este respins.</li>
+    <li>Tranzacție read-only + <code>statement_timeout</code> pentru a evita blocaje.</li>
+    <li>Modelul nu inventează tabele/coloane: folosește schema introspectată.</li>
+  </ul>
+
+  <h3 class="mt">Diagramă ER</h3>
+  <ul class="muted">
+    <li>Duble click pe nod pentru focus; zoom cu rotița; pan cu drag.</li>
+    <li>Toggles: afișare coloane/etichete FK; focus pe <code>schema.tabel</code>.</li>
+  </ul>
+
+  <div class="muted small mt">Întoarcere la aplicație: linkul „Acasă” sau închide acest ghid.</div>
+</div>
+
+{% endblock %}
+
