@@ -10,6 +10,10 @@
     <label class="muted">Descrie entitățile, câmpurile, relațiile (FK) și constrângerile.</label>
     <textarea name="spec" class="input" rows="10" placeholder="Ex.: Avem clienți și comenzi... include PK, FK, indici pentru căutare după email și data comenzii."></textarea>
     <div class="row mt">
+      <label class="switch"><input type="checkbox" name="use_schema"> <span>Folosește schema existentă ca referință</span></label>
+      <label class="switch"><input type="checkbox" name="migration"> <span>Mod migration (ALTER/INDEX)</span></label>
+    </div>
+    <div class="row mt">
       <button class="btn" type="submit">Generează DDL</button>
       <div class="loader"><div class="spinner"></div><span>Gândesc…</span></div>
     </div>
@@ -19,4 +23,3 @@
 <div id="ddl-out"></div>
 
 {% endblock %}
-

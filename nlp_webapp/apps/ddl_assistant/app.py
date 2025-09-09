@@ -1,6 +1,6 @@
 from __future__ import annotations
 import os, re, textwrap, time, json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 
 import requests
 from fastapi import FastAPI, Request, Form, HTTPException
@@ -15,7 +15,7 @@ app.mount("/static", StaticFiles(directory=os.path.join(BASE, "static")), name="
 templates = Jinja2Templates(directory=os.path.join(BASE, "templates"))
 
 # ────────────────────────────── State & Config ─────────────────────────
-STATE: Dict[str, Any] = {"dsn": None}
+STATE: Dict[str, Any] = {"dsn": None, "tables": {}, "fks": []}
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
 MODEL       = os.getenv("OLLAMA_MODEL", "qwen2.5:3b-instruct")
@@ -30,6 +30,78 @@ SQL_BLOCK = re.compile(r"```sql\s*(.*?)\s*```", re.I | re.S)
 def extract_sql(text: str) -> Optional[str]:
     m = SQL_BLOCK.search(text or "")
     return m.group(1).strip() if m else None
+
+# ────────────────────────────── DB Introspection ───────────────────────
+def introspect_schema(dsn: str) -> Tuple[Dict[str, Any], List[Tuple[str, str, str, str, str, str]]]:
+    """
+    Returnează:
+      tables: dict { "schema.table": { "columns": [(name,type), ...] } }
+      fks:    list  [(src_schema, src_table, src_col, dst_schema, dst_table, dst_col), ...]
+    """
+    tables: Dict[str, Any] = {}
+    fks: List[Tuple[str, str, str, str, str, str]] = []
+
+    q_cols = """
+    SELECT
+      c.table_schema, c.table_name, c.column_name,
+      CASE
+        WHEN c.data_type ILIKE 'character varying' THEN 'varchar('||COALESCE(c.character_maximum_length::text,'')||')'
+        WHEN c.data_type ILIKE 'character' THEN 'char('||COALESCE(c.character_maximum_length::text,'')||')'
+        ELSE c.data_type
+      END AS col_type
+    FROM information_schema.columns c
+    JOIN information_schema.tables t
+      ON t.table_schema = c.table_schema AND t.table_name = c.table_name
+    WHERE t.table_type='BASE TABLE' AND t.table_schema NOT IN ('pg_catalog','information_schema')
+    ORDER BY c.table_schema, c.table_name, c.ordinal_position;
+    """
+
+    q_fks = """
+    SELECT
+      src_ns.nspname  AS src_schema,
+      src_tbl.relname AS src_table,
+      src_col.attname AS src_column,
+      dst_ns.nspname  AS dst_schema,
+      dst_tbl.relname AS dst_table,
+      dst_col.attname AS dst_column
+    FROM pg_constraint fk
+    JOIN pg_class src_tbl ON fk.conrelid = src_tbl.oid
+    JOIN pg_namespace src_ns ON src_tbl.relnamespace = src_ns.oid
+    JOIN pg_class dst_tbl ON fk.confrelid = dst_tbl.oid
+    JOIN pg_namespace dst_ns ON dst_tbl.relnamespace = dst_ns.oid
+    JOIN unnest(fk.conkey) WITH ORDINALITY AS src(attnum, ord) ON true
+    JOIN unnest(fk.confkey) WITH ORDINALITY AS dst(attnum, ord) ON src.ord = dst.ord
+    JOIN pg_attribute src_col ON src_col.attrelid = src_tbl.oid AND src_col.attnum = src.attnum
+    JOIN pg_attribute dst_col ON dst_col.attrelid = dst_tbl.oid AND dst_col.attnum = dst.attnum
+    WHERE fk.contype = 'f'
+      AND src_ns.nspname NOT IN ('pg_catalog','information_schema');
+    """
+
+    import psycopg
+    with psycopg.connect(dsn, autocommit=True) as conn:
+        with conn.cursor() as cur:
+            cur.execute(q_cols)
+            for sch, tbl, col, typ in cur.fetchall():
+                key = f"{sch}.{tbl}"
+                tables.setdefault(key, {"columns": []})
+                tables[key]["columns"].append((col, typ))
+
+            cur.execute(q_fks)
+            for row in cur.fetchall():
+                fks.append(tuple(row))
+
+    return tables, fks
+
+def schema_summary_text(tables: Dict[str, Any], fks: List[Tuple[str, str, str, str, str, str]], limit_tables: int = 80, limit_cols: int = 32) -> str:
+    lines: List[str] = []
+    for tname in sorted(list(tables.keys()))[:limit_tables]:
+        cols = [c[0] for c in tables[tname].get("columns", [])][:limit_cols]
+        lines.append(f"{tname}: [{', '.join(cols)}]")
+    if fks:
+        lines.append("Foreign Keys:")
+        for (s_sch, s_tbl, s_col, d_sch, d_tbl, d_col) in fks[:200]:
+            lines.append(f"  {s_sch}.{s_tbl}.{s_col} -> {d_sch}.{d_tbl}.{d_col}")
+    return "\n".join(lines)
 
 # ────────────────────────────── Ollama helpers (fallbacks) ─────────────
 def try_hosts() -> List[str]:
@@ -194,6 +266,12 @@ async def connect(request: Request,
     # Păstrăm DSN doar pentru context; nu executăm DDL din aplicație.
     dsn = f"postgres://{user}:{password}@{host}:{port}/{dbname}"
     STATE["dsn"] = dsn
+    # Încearcă să introspectezi schema pentru context (non‑fatal dacă eșuează)
+    try:
+        tables, fks = introspect_schema(dsn)
+        STATE["tables"], STATE["fks"] = tables, fks
+    except Exception:
+        STATE["tables"], STATE["fks"] = {}, []
     return templates.TemplateResponse("designer.html", {"request": request})
 
 @app.get("/guide", response_class=HTMLResponse)
@@ -201,18 +279,31 @@ async def guide(request: Request):
     return templates.TemplateResponse("guide.html", {"request": request})
 
 @app.post("/generate", response_class=HTMLResponse)
-async def generate(request: Request, spec: str = Form(...)):
+async def generate(request: Request,
+                   spec: str = Form(...),
+                   use_schema: Optional[str] = Form(None),
+                   migration: Optional[str] = Form(None)):
     try:
         system = build_system_prompt()
-        user_msg = textwrap.dedent(f"""
-        DESCRIERE:
-        {spec}
+        ctx = []
+        ctx.append("DESCRIERE:\n" + spec)
 
-        CERINȚE:
-        - Postgres SQL doar DDL.
-        - include CREATE TABLE, chei primare/secundare, FK, indici relevanți.
-        - nume explicite pentru constrângeri/indici.
-        """).strip()
+        # Include schema existentă ca referință, dacă e bifat și avem ceva în memorie
+        if use_schema and STATE.get("tables"):
+            ctx.append("SCHEMA EXISTENTĂ (referință, nu o modifica; păstrează denumirile):\n" +
+                       schema_summary_text(STATE.get("tables", {}), STATE.get("fks", [])))
+
+        # Cerințe de bază + mod migration dacă e selectat
+        req = [
+            "CERINȚE:",
+            "- Postgres SQL doar DDL.",
+            "- Include CREATE TABLE, PK, FK, INDEX relevante.",
+            "- Nume explicite pentru constrângeri/indici.",
+        ]
+        if migration:
+            req.append("- MOD MIGRATION: propune ALTER TABLE/CREATE INDEX pentru a ajunge la noul model; evită DROP destructive.")
+            req.append("- Fără CREATE TABLE duplicate dacă tabelul există deja în schema de referință.")
+        user_msg = textwrap.dedent("\n\n".join(["\n".join(ctx), "\n".join(req)])).strip()
 
         content = call_ai([
             {"role": "system", "content": system},
